@@ -3,7 +3,7 @@ pipeline
     agent any
     stages
     {
-        stage('ContinuousDownload_master') 
+        stage('ContinuousDownload_loans') 
         {
             steps
             {
@@ -21,7 +21,7 @@ pipeline
                 }
             }
         }
-        stage('ContinuousBuild_master') 
+        stage('ContinuousBuild_loans') 
         {
             steps
             {
@@ -39,61 +39,5 @@ pipeline
                 }
             }
         }
-        stage('ContinuousDeployment_master') 
-        {
-            steps
-            {
-                script
-                {
-                    try
-                    {
-                        deploy adapters: [tomcat9(credentialsId: '5e216110-9656-45c8-bc75-bec87ddd167d', path: '', url: 'http://172.31.95.216:8080')], contextPath: 'testapp1', war: '**/*.war'
-                    }
-                    catch(Exception e1)
-                    {
-                        mail bcc: '', body: 'Jenkins is unable to deploy artifact to Tomcat QA server', cc: '', from: '', replyTo: '', subject: 'Deploment failed', to: 'middleware.team@gmail.com'
-                        exit(1)
-                    }
-                }
-            }
-        }
-        stage('ContinuousTesting_master') 
-        {
-            steps
-            {
-                script
-                {
-                    try
-                    {
-                        git 'https://github.com/selenium-saikrishna/FunctionalTesting.git'
-                        sh 'java -jar /var/lib/jenkins/workspace/DeclarativePipelineEmailEveryStep/testing.jar'
-                    }
-                    catch(Exception e1)
-                    {
-                        mail bcc: '', body: 'Selenium test scripts are failing', cc: '', from: '', replyTo: '', subject: 'Testing failed', to: 'testing.team@gmail.com'
-                        exit(1)
-                    }
-                }
-            }
-        }
-        stage('ContinuousDelivery_master') 
-        {
-            steps
-            {
-                script
-                {
-                    try
-                    {
-                        git 'https://github.com/selenium-saikrishna/FunctionalTesting.git'
-                        sh 'java -jar /var/lib/jenkins/workspace/DeclarativePipelineEmailEveryStep/testing.jar'
-                    }
-                    catch(Exception e1)
-                    {
-                        deploy adapters: [tomcat9(credentialsId: '5e216110-9656-45c8-bc75-bec87ddd167d', path: '', url: 'http://172.31.90.31:8080')], contextPath: 'prodapp1', war: '**/*.war'
-                        exit(1)
-                    }
-                }
-            }
-        }
-    }
+     }
 }
