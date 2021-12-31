@@ -3,7 +3,7 @@ pipeline
     agent any
     stages
     {
-        stage('ContinuousDownload_master') 
+        stage('ContinuousDownload_master')
         {
             steps
             {
@@ -13,33 +13,34 @@ pipeline
                     {
                         git 'https://github.com/sylvain-atanga/Maven.git'
                     }
-                    catch(Exception e1)
+                    catch(Exception e1) 
                     {
-                        mail bcc: '', body: 'Jenkins is unable to download the code from github', cc: '', from: '', replyTo: '', subject: 'Download failed', to: 'git.team@gmail.com'
+                        mail bcc: '', body: 'jenkins has failed to download code from github', cc: '', from: '', replyTo: '', subject: 'Download has failed', to: 'gitadmin@gmail.com'
                         exit(1)
                     }
                 }
             }
         }
-        stage('ContinuousBuild_master') 
+        stage('ContinuousBuild_master')
         {
             steps
             {
                 script
                 {
-                    try
+                     try
                     {
                         sh 'mvn package'
                     }
-                    catch(Exception e1)
+                    catch(Exception e2)
                     {
-                        mail bcc: '', body: 'Jenkins is unable to build artifact from code', cc: '', from: '', replyTo: '', subject: 'Build failed', to: 'development.team@gmail.com'
+                        mail bcc: '', body: 'jenkins has failed to build the code', cc: '', from: '', replyTo: '', subject: 'build has failed', to: 'devteam@gmail.com'
                         exit(1)
-                    }
+                    }    
                 }
+                
             }
         }
-        stage('ContinuousDeployment_master') 
+        stage('ContinuousDeployment_master')
         {
             steps
             {
@@ -47,17 +48,18 @@ pipeline
                 {
                     try
                     {
-                        deploy adapters: [tomcat9(credentialsId: '5e216110-9656-45c8-bc75-bec87ddd167d', path: '', url: 'http://172.31.95.216:8080')], contextPath: 'testapp1', war: '**/*.war'
+                        deploy adapters: [tomcat9(credentialsId: '5e216110-9656-45c8-bc75-bec87ddd167d', path: '', url: 'http://172.31.95.216:8080')], contextPath: 'testappp', war: '**/*.war'
                     }
-                    catch(Exception e1)
+                    catch(Exception e3)
                     {
-                        mail bcc: '', body: 'Jenkins is unable to deploy artifact to Tomcat QA server', cc: '', from: '', replyTo: '', subject: 'Deploment failed', to: 'middleware.team@gmail.com'
+                        mail bcc: '', body: 'jenkins has failed to deploy artifact to tomcat server', cc: '', from: '', replyTo: '', subject: 'deployment has failed', to: 'middlewareteam@gmail.com'
                         exit(1)
                     }
                 }
+                
             }
         }
-        stage('ContinuousTesting_master') 
+        stage('ContinuousTesting_master')
         {
             steps
             {
@@ -65,18 +67,20 @@ pipeline
                 {
                     try
                     {
-                        git 'https://github.com/selenium-saikrishna/FunctionalTesting.git'
-                        sh 'java -jar /var/lib/jenkins/workspace/DeclarativePipelineEmailEveryStep/testing.jar'
+                        git 'https://github.com/sylvain-atanga/FunctionalTesting.git'
+                        sh 'java -jar /var/lib/jenkins/workspace/ExceptionsDeclarative/testing.jar'
                     }
-                    catch(Exception e1)
+                    catch(Exception e4)
                     {
-                        mail bcc: '', body: 'Selenium test scripts are failing', cc: '', from: '', replyTo: '', subject: 'Testing failed', to: 'testing.team@gmail.com'
+                        mail bcc: '', body: 'selenium scripts have failed to test artifact', cc: '', from: '', replyTo: '', subject: 'testing has failed', to: 'testingteam@gmail.com'
                         exit(1)
                     }
                 }
+                
+                
             }
         }
-        stage('ContinuousDelivery_master') 
+        stage('ContinuousDelivery_master')
         {
             steps
             {
@@ -84,16 +88,20 @@ pipeline
                 {
                     try
                     {
-                        git 'https://github.com/selenium-saikrishna/FunctionalTesting.git'
-                        sh 'java -jar /var/lib/jenkins/workspace/DeclarativePipelineEmailEveryStep/testing.jar'
+                        deploy adapters: [tomcat9(credentialsId: '5e216110-9656-45c8-bc75-bec87ddd167d', path: '', url: 'http://172.31.90.31:8080')], contextPath: 'prodappp', war: '**/*.war'
                     }
-                    catch(Exception e1)
+                    catch(Exception e5)
                     {
-                        deploy adapters: [tomcat9(credentialsId: '5e216110-9656-45c8-bc75-bec87ddd167d', path: '', url: 'http://172.31.90.31:8080')], contextPath: 'prodapp1', war: '**/*.war'
-                        exit(1)
+                        mail bcc: '', body: 'jenkins has failed to deliver artifact to tomcat prodserver', cc: '', from: '', replyTo: '', subject: 'delivery has failed', to: 'Deliveryteam@gmail.com'
                     }
+                    
+                    
+                    
                 }
+                
             }
+            
         }
     }
 }
+  
